@@ -1,5 +1,7 @@
 /* https://html.alldatasheet.com/html-pdf/12198/ONSEMI/74HC595/181/1/74HC595.html (HOJA DE DATOS DEL 74HC595)
 
+  SE USA PULL UP EN TODO
+
  * CODIGO CON :
  * - I2C
  * - 74hc595
@@ -246,21 +248,18 @@ void cantViajes(){
    *
    * Si se pulsa el boton inicio se termina la configuracion de cantidad de viajes e inicia la cuenta regresiva
   */
-  while(digitalRead(inicio) == HIGH){
 
-    estadoIncremento = digitalRead(incremento);
-    if (estadoIncremento == HIGH){
-
-      delay(500);  // Este delay hay que sacarlo en un futuro, es para la retencion del pulsador
-      numViajes++; // Esto se podria hacer de 5 en 5
-      
-      lcd.setCursor(0, 1);
-      lcd.print(numViajes);
-    }
+ 
+  while((digitalRead(inicio) == HIGH) && (digitalRead(incremento) == HIGH)){
+ 
+    delay(500);
+    numViajes++; // Esto se podria hacer de 5 en 5
+    lcd.setCursor(0, 1);
+    lcd.print(numViajes);
   }
 
-  if (digitalRead(inicio) == LOW)
-  {
+  if (digitalRead(inicio) == LOW){
+    
     delay(500);
     aceptacion = 1;
     lcd.clear(); // el clear esta aca para que se ejecute solo una vez
@@ -346,5 +345,4 @@ void finDelJuego(){
   lcd.print("  Felicidades!  ");
   lcd.setCursor(0, 1);
   lcd.print(" Fin del juego! ");
-  delay(2000); // hay que sacar estos delay
 }
