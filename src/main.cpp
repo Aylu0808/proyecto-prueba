@@ -13,6 +13,7 @@
 #define infra3 A2
 #define infra4 A3
 #define infra5 0
+// Comentario para prueba 2
 
 #define pinLatch 8  // es la patita SH_CP
 #define clockPin 13 // es la patita DS
