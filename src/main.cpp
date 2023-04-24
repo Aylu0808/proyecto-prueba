@@ -18,7 +18,7 @@
  * - funcionamiento de leds 
  * - funcionamiento de pulsadores 
  * NO FUNCIONA 
- * - El incremento de viajes
+ * - El incremento de viajes ------------------- PUEDE SER POR EL TIMMER INTERRUPT
  *
  * FALTA
  * - servos
@@ -117,130 +117,141 @@ void setup()
 
 void loop(){
 
-  while(aceptacion == 0){
+  while (aceptacion == 0){ 
     /*
     * Este mensaje solo debe aparecer una vez 
-    * para eso se utiliza la flag aceptacion
-    * el estado de esta flag se cambia en cantViajes()
+    * para eso se utiliza la flag aceptacion 
+    * 
+    * sino se utiliza esa flag, despues hay problemas para que el resto de los mensajes del lcd permanezcan en pantalla
+    * el estado de esta flag se cambia en cantViajes()que buen codigo :)que buen codigo :)que buen codigo :)que buen codigo :)que buen codigo :)que buen codigo :)
     */
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Cant de viajes:");
-    cantViajes();
+    if(digitalRead(incremento) == LOW){
+      delay(500);
+      cantViajes();
+    }
+    
   }
-  switch (flagRegresion){
-    /*
-     * flagRegresion se utiliza para ir avanzando en los pasos del programa 
-    */
-    case 0:
-      lcd.setCursor(0, 0);
-      lcd.print("El juego inicia");
-      lcd.setCursor(0, 1);
-      lcd.print("     en: ");
-      flagRegresion = 1;
-    break;
-    case 1:
+  
+    
+    switch (flagRegresion){
       /*
-       * La funcion cuentaRegresiva empieza a interrumpirse con el timer a partir de ahora
-       * 
-       * tambien se muestra en pantalla
+      * flagRegresion se utiliza para ir avanzando en los pasos del programa 
       */
-      Timer1.initialize(1000000); // 1s
-      Timer1.attachInterrupt(cuentaRegresiva);
+      case 0:
+        lcd.setCursor(0, 0);
+        lcd.print("El juego inicia");
+        lcd.setCursor(0, 1);
+        lcd.print("     en: ");
+        flagRegresion = 1;
+      break;
+      case 1:
+        /*
+        * La funcion cuentaRegresiva empieza a interrumpirse con el timer a partir de ahora
+        * 
+        * tambien se muestra en pantalla
+        */
+        Timer1.initialize(1000000); // 1s
+        Timer1.attachInterrupt(cuentaRegresiva);
 
-      lcd.setCursor(10, 1);
-      lcd.print(regresion);
-    break;
-    case 2:
-      lcd.setCursor(0, 0);
-      lcd.print("    A JUGAR!    ");
-      lcd.setCursor(0, 1);
-      lcd.print("                ");
+        lcd.setCursor(10, 1);
+        lcd.print(regresion);
+      break;
+      case 2:
+        lcd.setCursor(0, 0);
+        lcd.print("    A JUGAR!    ");
+        lcd.setCursor(0, 1);
+        lcd.print("                ");
 
-      if (Serial.available() > 0)
-      {
-
-        state = Serial.read();
-        Serial.write(state);
-      }
-
-      if (state == '1')
-      {
-
-        grados++;
-
-        if (grados >= 180)
-        { // Protege el sero de no sobreexigirlos
-
-          grados = 180;
-        }
-        miservo_1.write(grados);
-        delay(10);
-        state = 0;
-      }
-
-      if (state == '2')
-      {
-
-        grados--;
-        if (grados <= 0)
-        { // Protege el servo
-
-          grados = 0;
-        }
-        miservo_1.write(grados);
-        delay(10);
-      }
-      if (state == '3')
-      {
-
-        grados++;
-
-        if (grados >= 180)
-        { // Protege el sero de no sobreexigirlos
-          grados = 180;
-        }
-        miservo_2.write(grados);
-        delay(10);
-
-        miservo_3.write(grados);
-        delay(10);
-      }
-      if (state == '4')
-      {
-        grados--;
-        if (grados <= 0)
-        { // Protege el servo
-
-          grados = 0;
-        }
-        miservo_2.write(grados);
-        delay(10);
-
-        miservo_3.write(grados);
-        delay(10);
-      }
-      if (activacionJuego == 0)
-      {
-        juego();
-      }
-      if (digitalRead(infra1) == LOW)
-      {
-        delay(500); // retencion del pulsador
-        contadorViajes++;
-
-        if (contadorViajes < numViajes)
+        if (Serial.available() > 0)
         {
-          activacionJuego = 0;
+
+          state = Serial.read();
+          Serial.write(state);
         }
-        if (contadorViajes >= numViajes)
+
+        if (state == '1')
         {
-          lcd.clear();
-          finDelJuego();
+
+          grados++;
+
+          if (grados >= 180)
+          { // Protege el sero de no sobreexigirlos
+
+            grados = 180;
+          }
+          miservo_1.write(grados);
+          delay(10);
+          state = 0;
         }
-      }
-    break;
-  }
+
+        if (state == '2')
+        {
+
+          grados--;
+          if (grados <= 0)
+          { // Protege el servo
+
+            grados = 0;
+          }
+          miservo_1.write(grados);
+          delay(10);
+        }
+        if (state == '3')
+        {
+
+          grados++;
+
+          if (grados >= 180)
+          { // Protege el sero de no sobreexigirlos
+            grados = 180;
+          }
+          miservo_2.write(grados);
+          delay(10);
+
+          miservo_3.write(grados);
+          delay(10);
+        }
+        if (state == '4')
+        {
+          grados--;
+          if (grados <= 0)
+          { // Protege el servo
+
+            grados = 0;
+          }
+          miservo_2.write(grados);
+          delay(10);
+
+          miservo_3.write(grados);
+          delay(10);
+        }
+
+
+        if (activacionJuego == 0)
+        {
+          juego();
+        }
+        if (digitalRead(infra1) == LOW)
+        {
+          delay(500); // retencion del pulsador
+          contadorViajes++;
+
+          if (contadorViajes < numViajes)
+          {
+            activacionJuego = 0;
+          }
+          if (contadorViajes >= numViajes)
+          {
+            lcd.clear();
+            finDelJuego();
+          }
+        }
+      break;
+    }
+  
 }
 
 void cantViajes(){
@@ -248,11 +259,8 @@ void cantViajes(){
    *
    * Si se pulsa el boton inicio se termina la configuracion de cantidad de viajes e inicia la cuenta regresiva
   */
+  while(digitalRead(inicio) == HIGH){
 
- 
-  while((digitalRead(inicio) == HIGH) && (digitalRead(incremento) == HIGH)){
- 
-    delay(500);
     numViajes++; // Esto se podria hacer de 5 en 5
     lcd.setCursor(0, 1);
     lcd.print(numViajes);
